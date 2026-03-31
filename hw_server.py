@@ -5,8 +5,10 @@ import re
 import json
 import argparse
 from PIL import Image, ImageDraw
+from PIL.ImagePalette import random
 from flask import Flask, request, jsonify, send_from_directory, abort
 from flask_cors import CORS
+import random
 
 DATASET_DIR = "dataset"
 IMAGE_DIRS   = {"single": "single", "stroke": "stroke", "time": "time"}
@@ -81,21 +83,34 @@ STROKE_PALETTE = [
 ]
 
 def generate_image(strokes, img_size, color_mode):
-    img  = Image.new("RGB", (img_size, img_size), (255, 255, 255))
+    img = Image.new("L", (img_size, img_size), 255)  # grayscale
     draw = ImageDraw.Draw(img)
-    n    = len(strokes)
+
+    # Color handling
+    if color_mode != "single":
+        img = img.convert("RGB")
+        draw = ImageDraw.Draw(img)
+
     for i, stroke in enumerate(strokes):
         if len(stroke) < 2:
             continue
+
         if color_mode == "single":
-            color = (0, 0, 0)
+            color = 0  # black
+
         elif color_mode == "stroke":
-            color = STROKE_PALETTE[i % len(STROKE_PALETTE)]
-        else:  # time
-            t = i / max(1, n - 1)
-            color = (int(255 * t), 0, int(255 * (1 - t)))
+            color = tuple(random.randint(0, 255) for _ in range(3))
+
+        elif color_mode == "time":
+            color = (
+                int(255 * i / max(1, len(strokes))),
+                0,
+                255 - int(255 * i / max(1, len(strokes)))
+            )
+
         for j in range(1, len(stroke)):
-            draw.line([stroke[j-1], stroke[j]], fill=color, width=2)
+            draw.line([stroke[j - 1], stroke[j]], fill=color, width=2)
+
     return img
 
 
