@@ -76,12 +76,6 @@ def normalize_strokes(strokes, img_size, padding=10):
     return [[(x + ox, y + oy) for x, y in s] for s in normed]
 
 
-STROKE_PALETTE = [
-    (245, 197, 24), (224, 90, 43),  (74, 222, 128), (96, 165, 250),
-    (244, 114, 182),(167, 139, 250),(52, 211, 153), (251, 146, 60),
-    (56, 189, 248), (232, 121, 249)
-]
-
 def generate_image(strokes, img_size, color_mode):
     img = Image.new("L", (img_size, img_size), 255)  # grayscale
     draw = ImageDraw.Draw(img)
@@ -285,7 +279,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Myanmar HW Collector – Mobile Web Server")
     parser.add_argument("--file", required=True, help="Text file with one syllable per line")
-    parser.add_argument("--port", type=int, default=5000)
+    parser.add_argument("--port", type=int, default=5005)
     parser.add_argument("--host", default="0.0.0.0")
     args = parser.parse_args()
 
